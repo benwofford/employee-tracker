@@ -57,6 +57,9 @@ const mainPrompts = [
       name: '',
       choices: '',
     },
+    {
+    //TODO: Exit
+    }
   ]
 //   .then((data) => {
 //     const filename = `${data.name.toLowerCase().split(' ').join('')}.json`;
