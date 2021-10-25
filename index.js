@@ -3,64 +3,102 @@ const fs = require('fs');
 
 const mainPrompts = [
     {
+    // Main Menu
       type: 'list',
       message: 'What would you like to do?',
       name: 'main',
-      choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role'],
+      choices: [
+          'View all departments', 
+          'View all roles', 
+          'View all employees', 
+          'Add a department', 
+          'Add a role', 
+          'Add an employee', 
+          'Update an employee role',
+        ],
     },
     {
-    // TODO: View all departments
-      type: '',
-      message: '',
-      name: '',
-      choices: '',
+    // View all departments
+      type: 'list',
+      message: 'What would you like to do?',
+      name: 'allDepartments',
+      choices: [
+          'Sales',
+          'Engineering',
+          'Finance',
+          'Legal',
+        ],
     },
     {
-    // TODO: View all roles
-      type: '',
-      message: '',
-      name: '',
-      choices: '',
+    // View all roles
+      type: 'list',
+      message: 'What would you like to do?',
+      name: 'allRoles',
+      choices: [
+          'Sales Lead',
+          'Salesperson',
+          'Lead Engineer',
+          'Software Engineer',
+          'Account Manager',
+          'Accountant',
+          'Legal Team Lead',
+        ],
     },
     {
-    // TODO: View all employees
-      type: '',
-      message: '',
-      name: '',
-      choices: '',
+    // View all employees
+      type: 'list',
+      message: 'What would you like to do?',
+      name: 'allEmployees',
+      choices: [
+          'Frank Reynolds',
+          'Dennis Reynolds',
+          'Ronald McDonald',
+          'The Waitress',
+          'Matthew Mara',
+          'Deandra Reynolds',
+          'Liam McPoyle',
+          'Charlie Kelly',
+      ],
     },
     {
-    // TODO: Add a department
-      type: '',
-      message: '',
-      name: '',
-      choices: '',
+    // Add department
+      type: 'input',
+      message: 'What would you like to do?',
+      name: 'addDepartment',
     },
     {
-    // TODO: Add a role
-      type: '',
-      message: '',
-      name: '',
-      choices: '',
+    // Add a role
+      type: 'input',
+      message: 'What would you like to do?',
+      name: 'addRole',
     },
     {
-    // TODO: Add an employee
-      type: '',
-      message: '',
-      name: '',
-      choices: '',
+    // Add an employee
+      type: 'input',
+      message: 'What would you like to do?',
+      name: 'addEmployee',
     },
     {
-    // TODO: Update an employee role
-      type: '',
-      message: '',
-      name: '',
-      choices: '',
+    // Update an employee role
+      type: 'input',
+      message: 'What would you like to do?',
+      name: 'update',
     },
-    {
-    //TODO: Exit
-    }
-  ]
+  ];
+
+// TODO: Is this right?
+const exit = () =>
+  inquirer.prompt([
+      {
+          type: "confirm",
+          message: "Want to do anything else?",
+          name: "exit",
+      },
+  ])
+  .then((answer) => {
+      if (answer.moreQuery) return init();
+  });
+
 //   .then((data) => {
 //     const filename = `${data.name.toLowerCase().split(' ').join('')}.json`;
 
@@ -68,5 +106,10 @@ const mainPrompts = [
 //       err ? console.log(err) : console.log('Success!')
 //     );
 //   })
-  
-userInput(mainPrompts);
+
+// TODO: tidy up initialization prompt
+function init() {
+    inquirer.prompt(mainPrompts).then(async (answer) => {
+        console.log(answer)
+    });
+};
