@@ -12,9 +12,14 @@ const connection = mysql.createConnection({
     user: 'root',
     password: '',
     database: 'employee_db'
-},
-    console.log(`Connection to employee_db established.`)
-);
+});
+
+connection.connect((err) => {
+  if(err) {
+    throw err;
+  }
+  console.log(`Connection to employee_db established.`)
+});
 
 // View all departments
 app.get('/api/departments', (req, res) => {
@@ -111,7 +116,7 @@ app.post('/api/new-employee', (req, res) => {
     const sql = `INSERT INTO employee (employee_name)
       VALUES (?)`;
 // TODO: is this correct for data insertion?
-    db.query(sql, employee_first_name, employee_last_name, employee_role_id, employee_manager_id, (err, result) => {
+    db.query(sql, [employee_first_name, employee_last_name, employee_role_id, employee_manager_id], (err, result) => {
       if (err) {
         res.status(400).json({ error: err.message });
         return;

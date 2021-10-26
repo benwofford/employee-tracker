@@ -1,12 +1,13 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
+const express = require('express');
 
 const mainPrompts = [
     {
     // Main Menu
       type: 'list',
-      message: 'What would you like to do?',
       name: 'main',
+      message: 'What would you like to do?',
       choices: [
           'View all departments', 
           'View all roles', 
@@ -20,8 +21,8 @@ const mainPrompts = [
     {
     // View all departments
       type: 'list',
-      message: 'What would you like to do?',
       name: 'allDepartments',
+      message: 'What would you like to do?',
       choices: [
           'Sales',
           'Engineering',
@@ -32,8 +33,8 @@ const mainPrompts = [
     {
     // View all roles
       type: 'list',
-      message: 'What would you like to do?',
       name: 'allRoles',
+      message: 'What would you like to do?',
       choices: [
           'Sales Lead',
           'Salesperson',
@@ -47,8 +48,8 @@ const mainPrompts = [
     {
     // View all employees
       type: 'list',
-      message: 'What would you like to do?',
       name: 'allEmployees',
+      message: 'What would you like to do?',
       choices: [
           'Frank Reynolds',
           'Dennis Reynolds',
@@ -63,49 +64,42 @@ const mainPrompts = [
     {
     // Add department
       type: 'input',
-      message: 'What would you like to do?',
       name: 'addDepartment',
+      message: 'What would you like to do?',
     },
     {
     // Add a role
       type: 'input',
-      message: 'What would you like to do?',
       name: 'addRole',
+      message: 'What would you like to do?',
     },
     {
     // Add an employee
       type: 'input',
-      message: 'What would you like to do?',
       name: 'addEmployee',
+      message: 'What would you like to do?',
     },
     {
     // Update an employee role
       type: 'input',
-      message: 'What would you like to do?',
       name: 'update',
+      message: 'What would you like to do?',
     },
-  ];
+    {
+        type: "confirm",
+        name: "exit",
+        message: "Want to do anything else?",
+    },
+// .then((answer) => {
+//     if (answer.mainPrompts) return init();
+// });
+];
 
-// TODO: Is this right?
-const exit = () =>
-  inquirer.prompt([
-      {
-          type: "confirm",
-          message: "Want to do anything else?",
-          name: "exit",
-      },
-  ])
-  .then((answer) => {
-      if (answer.moreQuery) return init();
-  });
+// TODO: Add a department function
+const deptName = `${answers.addDepartment}.json`;
 
-//   .then((data) => {
-//     const filename = `${data.name.toLowerCase().split(' ').join('')}.json`;
 
-//     fs.writeFile(filename, JSON.stringify(data, null, '\t'), (err) =>
-//       err ? console.log(err) : console.log('Success!')
-//     );
-//   })
+
 
 // TODO: tidy up initialization prompt
 function init() {
@@ -113,3 +107,5 @@ function init() {
         console.log(answer)
     });
 };
+
+init();
