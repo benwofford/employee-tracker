@@ -1,5 +1,6 @@
-const inquirer = require('inquirer');
-const fs = require('fs');
+const inquirer = require("inquirer");
+const fs = require("fs");
+const db = require("./db/connection");
 
 // const mainPrompts = [
 //     {
@@ -8,12 +9,12 @@ const fs = require('fs');
 //       name: 'main',
 //       message: 'What would you like to do?',
 //       choices: [
-//           'View all departments', 
-//           'View all roles', 
-//           'View all employees', 
-//           'Add a department', 
-//           'Add a role', 
-//           'Add an employee', 
+//           'View all departments',
+//           'View all roles',
+//           'View all employees',
+//           'Add a department',
+//           'Add a role',
+//           'Add an employee',
 //           'Update an employee role',
 //         ],
 //     },
@@ -91,106 +92,184 @@ const fs = require('fs');
 //     },
 // ];
 
-// TODO: prompt to end function? (on each prompt)
-
-
 // TODO: tidy up initialization prompt
 function init() {
-    inquirer.prompt({
+  inquirer
+    .prompt({
       // Main Menu
-        type: 'list',
-        name: 'main',
-        message: 'What would you like to do?',
-        choices: [
-            {
-              name: 'View all departments',
-              value: 'VIEW_DEPT',
-            }, 
-            {
-              name: 'View all roles',
-              value: 'VIEW_ROLES'
-            },
-            {
-              name: 'View all employees',
-              value: 'VIEW_EMP' 
-            },
-            {
-              name: 'Add a department',
-              value: 'ADD_DEPT'
-            },
-            {
-              name: 'Add a role',
-              value: 'ADD_ROLE'
-            },
-            {
-              name: 'Add an employee',
-              value: 'ADD_EMP'
-            },
-            {
-              name: 'Update an employee role',
-              value: 'UPDATE'
-            }
-          ],
-      })
-      .then(async (answer) => {
-        console.log(answer)
-        if (answer.choice === "VIEW_DEPT") {
-          // query db for all depts.
-          const sql = `SELECT id, department_name FROM department`;
-    
-          db.query(sql, (err, rows) => {
-            if (err) {
-              console.log({ error: err.message });
-               return;
-            }
-            console.table(rows)
+      type: "list",
+      name: "choice",
+      message: "What would you like to do?",
+      choices: [
+        {
+          name: "View all departments",
+          value: "VIEW_DEPT",
+        },
+        {
+          name: "View all roles",
+          value: "VIEW_ROLES",
+        },
+        {
+          name: "View all employees",
+          value: "VIEW_EMP",
+        },
+        {
+          name: "Add a department",
+          value: "ADD_DEPT",
+        },
+        {
+          name: "Add a role",
+          value: "ADD_ROLE",
+        },
+        {
+          name: "Add an employee",
+          value: "ADD_EMP",
+        },
+        {
+          name: "Update an employee role",
+          value: "UPDATE",
+        },
+      ],
+    })
+    .then(async (answer) => {
+      console.log(answer);
+      if (answer.choice === "VIEW_DEPT") {
+        // query db for all depts.
+        const sql = `SELECT id, name FROM department`;
+
+        db.query(sql, (err, rows) => {
+          if (err) {
+            console.log({ error: err.message });
+            return;
+          }
+          console.table(rows);
+        });
+      } else if (answer.choice === "VIEW_ROLES") {
+        // query db for all roles
+        const sql = `SELECT id, title, salary, department_id FROM role`;
+
+        db.query(sql, (err, rows) => {
+          if (err) {
+            console.log({ error: err.message });
+            return;
+          }
+          console.table(rows);
+        });
+      } else if (answer.choice === "VIEW_EMP") {
+        // query db for all employees
+        const empSQL = `SELECT id, first_name, last_name FROM employee`;
+        const roleSQL = "SELECT title, salary, department_id FROM role";
+        db.query(sql, (err, rows) => {
+          if (err) {
+            console.log({ error: err.message });
+            return;
+          }
+          console.table(rows);
+        });
+      } else if (answer.choice === "ADD_DEPT") {
+        // query db for dept id & dept name
+        inquirer
+          .prompt({
+            type: "input",
+            name: "addDept",
+            message: "What would you like to do?",
           })
-        } else if (answer.choice === "VIEW_ROLES") {
-          // query db for all roles
-            const sql = `SELECT id, title, salary, department_id FROM role`;
-            
-            db.query(sql, (err, rows) => {
+          .then((answers) => {
+            console.log(answers);
+            const addDeptSQL =
+              'INSERT INTO department(name) VALUES("' + answers.addDept + '")';
+            console.log(addDeptSQL);
+            db.query(addDeptSQL, (err, result) => {
               if (err) {
                 console.log({ error: err.message });
-                 return;
-              };
-              console.table(rows)
-              });
-        } else if (answer.choice === "VIEW_EMP") {
-          // query db for all employees
-            const empSQL = `SELECT id, first_name, last_name FROM employee`;
-            const roleSQL = 'SELECT title, salary, department_id FROM role';
-            db.query(sql, (err, rows) => {
-              if (err) {
-                console.log({ error: err.message });
-                 return;
-            };
-              console.table(rows)
+                return;
+              }
+              console.log(result);
+              init();
+            });
           });
-        } else if (answer.choice === "ADD_DEPT") {
-          
-          // call .fs to write to db?
+      } else if (answer.choice === "ADD_ROLE") {
+        const deptChoices = [];
+        // query db for all depts.
+        const sql = `SELECT id, name FROM department`;
 
-        } else if (answer.choice === "ADD_ROLE") {
+        db.query(sql, (err, rows) => {
+          if (err) {
+            console.log({ error: err.message });
+            return;
+          }
+          console.table(rows);
+          for (let i = 0; i < rows.length; i++) {
+            deptChoices.push(rows[i].name);
+          }
 
-        } else if (answer.choice === "ADD_EMP") {
-
-        } else if (answer.choice === "UPDATE_EMP") {
-          // query db for user id, first name & last name
-          // query db for role id & role name
-          const userChoices = [];
-          const roleChoices = [];
-          const userSQL = `Select id, first_name, last_name from employee`
-          db.query(userSQL, (err, rows) => {
-            // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
-            if (err) {
-              console.log({ error: err.message });
-               return;
-            }
-            console.table(rows)
+          // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
+          inquirer
+            .prompt({
+              type: "input",
+              name: "addDept",
+              message: "What would you like to do?",
+            })
+            .then((answers) => {
+              console.log(answers);
+              const addDeptSQL =
+                'INSERT INTO department(name) VALUES("' +
+                answers.addDept +
+                '")';
+              console.log(addDeptSQL);
+              db.query(addDeptSQL, (err, result) => {
+                if (err) {
+                  console.log({ error: err.message });
+                  return;
+                }
+                console.log(result); //might change (result)
+                init();
+              });
+            });
+        });
+      } else if (answer.choice === "ADD_EMP") {
+        inquirer
+          .prompt({
+            type: "input",
+            name: "addDept",
+            message: "What would you like to do?",
           })
-        }
+          .then((answers) => {
+            console.log(answers);
+            const addDeptSQL =
+              'INSERT INTO department(name) VALUES("' + answers.addDept + '")';
+            console.log(addDeptSQL);
+            db.query(addDeptSQL, (err, result) => {
+              if (err) {
+                console.log({ error: err.message });
+                return;
+              }
+              console.log(result); //might change (result)
+              init();
+            });
+          });
+      } else if (answer.choice === "UPDATE_EMP") {
+        // query db for user id, first name & last name
+        // query db for role id & role name
+        const userChoices = [];
+        const roleChoices = [];
+        const userSQL = `Select id, first_name, last_name from employee`;
+        db.query(userSQL, (err, rows) => {
+          // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
+          if (err) {
+            console.log({ error: err.message });
+            return;
+          }
+          console.table(rows);
+        });
+      }
     });
-};
+}
 
-init();
+db.connect((err) => {
+  if (err) {
+    throw err;
+  }
+  console.log(`Connection to employee_db established.`);
+  init();
+});
