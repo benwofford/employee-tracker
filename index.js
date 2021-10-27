@@ -175,7 +175,7 @@ function init() {
         inquirer.prompt({
             type: "input",
             name: "addDept",
-            message: "Enter the name of the department.",
+            message: "Enter the name of the new department.",
           })
           .then((answers) => {
             console.log(answers);
@@ -190,10 +190,10 @@ function init() {
               init();
             });
           });
+          
         const deptChoices = [];
         // query db for all depts.
         const sql = `SELECT id, name FROM department`;
-
         db.query(sql, (err, rows) => {
           if (err) {
             console.log({ error: err.message });
@@ -202,7 +202,7 @@ function init() {
           console.table(rows);
           for (let i = 0; i < rows.length; i++) {
             deptChoices.push(rows[i].name);
-          } else if (answer.choice === "ADD_ROLE") 
+          } else if (answer.choice === "ADD_ROLE") {
           // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
           inquirer.prompt({
               type: "input",
@@ -223,7 +223,7 @@ function init() {
                 init();
               });
             });
-        });
+        }});
       } else if (answer.choice === "ADD_EMP") {
         inquirer
           .prompt({
