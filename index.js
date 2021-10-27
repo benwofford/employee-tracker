@@ -98,7 +98,7 @@ const mainPrompts = [
 // TODO: Add a department function
 const deptName = `${answers.addDepartment}.json`;
 
-
+// TODO: prompt to end function? (on each prompt)
 
 
 // TODO: tidy up initialization prompt
