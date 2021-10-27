@@ -92,10 +92,8 @@ const db = require("./db/connection");
 //     },
 // ];
 
-// TODO: tidy up initialization prompt
 function init() {
-  inquirer
-    .prompt({
+  inquirer.prompt({
       // Main Menu
       type: "list",
       name: "choice",
@@ -129,6 +127,10 @@ function init() {
           name: "Update an employee role",
           value: "UPDATE",
         },
+        {
+          name: "Exit",
+          value: "EXIT"
+        }
       ],
     })
     .then(async (answer) => {
@@ -143,6 +145,7 @@ function init() {
             return;
           }
           console.table(rows);
+          init();
         });
       } else if (answer.choice === "VIEW_ROLES") {
         // query db for all roles
@@ -154,30 +157,29 @@ function init() {
             return;
           }
           console.table(rows);
+          init();
         });
       } else if (answer.choice === "VIEW_EMP") {
         // query db for all employees
-        const empSQL = `SELECT id, first_name, last_name FROM employee`;
-        const roleSQL = "SELECT title, salary, department_id FROM role";
-        db.query(sql, (err, rows) => {
+        const empSQL = `SELECT id, first_name, last_name FROM employee` + `SELECT title, salary, department_id FROM role`;
+        db.query(empSQL, (err, rows) => {
           if (err) {
             console.log({ error: err.message });
             return;
           }
           console.table(rows);
+          init();
         });
       } else if (answer.choice === "ADD_DEPT") {
         // query db for dept id & dept name
-        inquirer
-          .prompt({
+        inquirer.prompt({
             type: "input",
             name: "addDept",
-            message: "What would you like to do?",
+            message: "Enter the name of the department.",
           })
           .then((answers) => {
             console.log(answers);
-            const addDeptSQL =
-              'INSERT INTO department(name) VALUES("' + answers.addDept + '")';
+            const addDeptSQL = 'INSERT INTO department(name) VALUES("' + answers.addDept + '")';
             console.log(addDeptSQL);
             db.query(addDeptSQL, (err, result) => {
               if (err) {
@@ -188,7 +190,6 @@ function init() {
               init();
             });
           });
-      } else if (answer.choice === "ADD_ROLE") {
         const deptChoices = [];
         // query db for all depts.
         const sql = `SELECT id, name FROM department`;
@@ -201,11 +202,9 @@ function init() {
           console.table(rows);
           for (let i = 0; i < rows.length; i++) {
             deptChoices.push(rows[i].name);
-          }
-
+          } else if (answer.choice === "ADD_ROLE") 
           // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
-          inquirer
-            .prompt({
+          inquirer.prompt({
               type: "input",
               name: "addDept",
               message: "What would you like to do?",
@@ -213,16 +212,14 @@ function init() {
             .then((answers) => {
               console.log(answers);
               const addDeptSQL =
-                'INSERT INTO department(name) VALUES("' +
-                answers.addDept +
-                '")';
+                'INSERT INTO department(name) VALUES("' + answers.addDept + '")';
               console.log(addDeptSQL);
               db.query(addDeptSQL, (err, result) => {
                 if (err) {
                   console.log({ error: err.message });
                   return;
                 }
-                console.log(result); //might change (result)
+                console.log(result);
                 init();
               });
             });
@@ -244,7 +241,7 @@ function init() {
                 console.log({ error: err.message });
                 return;
               }
-              console.log(result); //might change (result)
+              console.log(result);
               init();
             });
           });
@@ -261,8 +258,12 @@ function init() {
             return;
           }
           console.table(rows);
+          init();
         });
-      }
+      } else if (answer.choice === "EXIT") {
+        console.log("Goodbye.");
+        process.exit();
+      } 
     });
 }
 
