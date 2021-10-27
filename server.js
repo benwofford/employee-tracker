@@ -1,7 +1,9 @@
+
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
 const PORT = process.env.PORT || 3001;
+
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -18,52 +20,52 @@ connection.connect((err) => {
 });
 
 // View all departments
-app.get('/api/departments', (req, res) => {
-    const sql = `SELECT id, department_name FROM department`;
+// app.get('/api/departments', (req, res) => {
+//     const sql = `SELECT id, department_name FROM department`;
     
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-         return;
-      }
-      res.json({
-        message: 'success',
-        data: rows
-      });
-    });
-  });
+//     db.query(sql, (err, rows) => {
+//       if (err) {
+//         res.status(500).json({ error: err.message });
+//          return;
+//       }
+//       res.json({
+//         message: 'success',
+//         data: rows
+//       });
+//     });
+//   });
 
 // View all roles
-app.get('/api/roles', (req, res) => {
-    const sql = `SELECT id, title, salary, department_id FROM role`;
+// app.get('/api/roles', (req, res) => {
+//     const sql = `SELECT id, title, salary, department_id FROM role`;
     
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-         return;
-      }
-      res.json({
-        message: 'success',
-        data: rows
-      });
-    });
-  });
+//     db.query(sql, (err, rows) => {
+//       if (err) {
+//         res.status(500).json({ error: err.message });
+//          return;
+//       }
+//       res.json({
+//         message: 'success',
+//         data: rows
+//       });
+//     });
+//   });
 
 // View all employees
-app.get('/api/employee', (req, res) => {
-    const sql = `SELECT id, first_name, last_name FROM employee`;
-// TODO: connect employee & role in query.sql to get salary, job title, department & managers.
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-         return;
-      }
-      res.json({
-        message: 'success',
-        data: rows
-      });
-    });
-  });
+// app.get('/api/employee', (req, res) => {
+//     const sql = `SELECT id, first_name, last_name FROM employee`;
+// // TODO: connect employee & role in query.sql to get salary, job title, department & managers.
+//     db.query(sql, (err, rows) => {
+//       if (err) {
+//         res.status(500).json({ error: err.message });
+//          return;
+//       }
+//       res.json({
+//         message: 'success',
+//         data: rows
+//       });
+//     });
+//   });
 
 // Add a department
 app.post('/api/new-department', (req, res) => {
@@ -144,13 +146,4 @@ app.put('/api/employee/:id', (req, res) => {
         });
       }
     });
-  });
-
-// Default response for any other request (Not Found)
-app.use((req, res) => {
-    res.status(404).end();
-  });
-  ​
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
   });

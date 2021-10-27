@@ -26,5 +26,8 @@ CREATE TABLE employee (
     manager_id INT,
     FOREIGN KEY (role_id)
     REFERENCES role(id)
-    --TODO: link manager id to employee id (to hold reference to another employee that is the manager of the current employee (null if the employee has no manager))
+    FOREIGN KEY (manager_id)
+    REFERENCES (role(manager_id))
+    --TODO: Think I fixed it?
+    --link manager id to employee id (to hold reference to another employee that is the manager of the current employee (null if the employee has no manager))
 );
