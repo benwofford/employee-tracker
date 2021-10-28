@@ -161,15 +161,27 @@ function init() {
         });
       } else if (answer.choice === "VIEW_EMP") {
         // query db for all employees
-        const empSQL = `SELECT id, first_name, last_name FROM employee` + `SELECT title, salary, department_id FROM role`;
+        const empSQL = `SELECT first_name, last_name, role_id, manager_id
+                        FROM employee
+                        INNER JOIN role
+                        ON role_id = role_id`;
+        // query db for roles of employees 
+        // const roleSQL = `SELECT title, salary, department_id FROM role`;
         db.query(empSQL, (err, rows) => {
           if (err) {
             console.log({ error: err.message });
             return;
           }
           console.table(rows);
-          init();
         });
+        // db.query(roleSQL, (err, rows) => {
+        //   if (err) {
+        //     console.log({ error: err.message });
+        //     return;
+        //   }
+        //   console.table(rows);
+        //   init();
+        // });        
       } else if (answer.choice === "ADD_DEPT") {
         // query db for dept id & dept name
         inquirer.prompt({
@@ -190,7 +202,6 @@ function init() {
               init();
             });
           });
-          
         const deptChoices = [];
         // query db for all depts.
         const sql = `SELECT id, name FROM department`;
@@ -201,8 +212,9 @@ function init() {
           }
           console.table(rows);
           for (let i = 0; i < rows.length; i++) {
-            deptChoices.push(rows[i].name);
-          } else if (answer.choice === "ADD_ROLE") {
+            deptChoices.push(rows[i].name);}
+          }); 
+        } else if (answer.choice === "ADD_ROLE") {
           // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
           inquirer.prompt({
               type: "input",
@@ -223,8 +235,7 @@ function init() {
                 init();
               });
             });
-        }});
-      } else if (answer.choice === "ADD_EMP") {
+        } else if (answer.choice === "ADD_EMP") {
         inquirer
           .prompt({
             type: "input",
@@ -263,14 +274,15 @@ function init() {
       } else if (answer.choice === "EXIT") {
         console.log("Goodbye.");
         process.exit();
-      } 
-    });
-}
-
+      }
+    }); 
+  };
+  
 db.connect((err) => {
   if (err) {
     throw err;
   }
   console.log(`Connection to employee_db established.`);
   init();
-});
+  })
+
