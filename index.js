@@ -160,14 +160,13 @@ function init() {
           inquirer.prompt({
               type: "input",
               name: "addRole",
-              message: "Enter the name, salary and department of the new role.",
+              message: "Enter the title and salary of the new role.",
             })
             .then((answers) => {
               console.log(answers);
-              const addDeptSQL =
-                'INSERT INTO department(name) VALUES("' + answers.addDept + '")';
-              console.log(addDeptSQL);
-              db.query(addDeptSQL, (err, result) => {
+              const addRoleSQL = 'INSERT INTO role (title, salary) VALUES("' + answers.addRole + '", "' + answers.addRole + '")';
+              console.log(addRoleSQL);
+              db.query(addRoleSQL, (err, result) => {
                 if (err) {
                   console.log({ error: err.message });
                   return;
@@ -176,7 +175,19 @@ function init() {
                 init();
               });
             });
-        } else if (answer.choice === "ADD_EMP") {
+            const roleChoices = [];
+            // query db for all roles
+            const roleSQL = 'SELECT title, salary FROM role';
+            db.query(roleSQL, (err, rows) => {
+              if (err) {
+                console.log({ error: err.message });
+                return;
+              }
+              console.table(rows);
+              for (let i = 0; i < rows.length; i++) {
+                roleChoices.push(rows[i].name);}
+              });
+      } else if (answer.choice === "ADD_EMP") {
         inquirer
           .prompt({
             type: "input",
