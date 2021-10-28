@@ -1,66 +1,11 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
 const db = require("./db/connection");
+const logo = require('asciiart-logo');
+const config = require('./package.json');
+console.log(logo(config).render());
 
-// const mainPrompts = [
-//     {
-//     // Main Menu
-//       type: 'list',
-//       name: 'main',
-//       message: 'What would you like to do?',
-//       choices: [
-//           'View all departments',
-//           'View all roles',
-//           'View all employees',
-//           'Add a department',
-//           'Add a role',
-//           'Add an employee',
-//           'Update an employee role',
-//         ],
-//     },
-//     {
-//     // View all departments
-//       type: 'list',
-//       name: 'allDepartments',
-//       message: 'What would you like to do?',
-//       choices: [
-//           'Sales',
-//           'Engineering',
-//           'Finance',
-//           'Legal',
-//         ],
-//     },
-//     {
-//     // View all roles
-//       type: 'list',
-//       name: 'allRoles',
-//       message: 'What would you like to do?',
-//       choices: [
-//           'Sales Lead',
-//           'Salesperson',
-//           'Lead Engineer',
-//           'Software Engineer',
-//           'Account Manager',
-//           'Accountant',
-//           'Legal Team Lead',
-//         ],
-//     },
-//     {
-//     // View all employees
-//       type: 'list',
-//       name: 'allEmployees',
-//       message: 'What would you like to do?',
-//       choices: [
-//           'Frank Reynolds',
-//           'Dennis Reynolds',
-//           'Ronald McDonald',
-//           'The Waitress',
-//           'Matthew Mara',
-//           'Deandra Reynolds',
-//           'Liam McPoyle',
-//           'Charlie Kelly',
-//       ],
-//     },
+
 //     {
 //     // Add department
 //       type: 'input',
@@ -91,6 +36,10 @@ const db = require("./db/connection");
 //         message: "Want to do anything else?",
 //     },
 // ];
+
+const loadImage = () => {
+  console.log(logo);
+};
 
 function init() {
   inquirer.prompt({
@@ -161,27 +110,19 @@ function init() {
         });
       } else if (answer.choice === "VIEW_EMP") {
         // query db for all employees
-        const empSQL = `SELECT first_name, last_name, role_id, manager_id
+        const empSQL = `SELECT first_name, last_name, role_id, manager_id, role.title, role.salary, role.department_id
                         FROM employee
                         INNER JOIN role
-                        ON role_id = role_id`;
+                        ON employee.role_id = role.id`;
         // query db for roles of employees 
-        // const roleSQL = `SELECT title, salary, department_id FROM role`;
         db.query(empSQL, (err, rows) => {
           if (err) {
             console.log({ error: err.message });
             return;
           }
           console.table(rows);
-        });
-        // db.query(roleSQL, (err, rows) => {
-        //   if (err) {
-        //     console.log({ error: err.message });
-        //     return;
-        //   }
-        //   console.table(rows);
-        //   init();
-        // });        
+          init();
+        });    
       } else if (answer.choice === "ADD_DEPT") {
         // query db for dept id & dept name
         inquirer.prompt({
@@ -214,12 +155,12 @@ function init() {
           for (let i = 0; i < rows.length; i++) {
             deptChoices.push(rows[i].name);}
           }); 
-        } else if (answer.choice === "ADD_ROLE") {
+      } else if (answer.choice === "ADD_ROLE") {
           // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
           inquirer.prompt({
               type: "input",
-              name: "addDept",
-              message: "What would you like to do?",
+              name: "addRole",
+              message: "Enter the name, salary and department of the new role.",
             })
             .then((answers) => {
               console.log(answers);
