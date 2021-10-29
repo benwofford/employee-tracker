@@ -5,41 +5,47 @@ const logo = require('asciiart-logo');
 const config = require('./package.json');
 console.log(logo(config).render());
 
-
-//     {
-//     // Add department
-//       type: 'input',
-//       name: 'addDepartment',
-//       message: 'What would you like to do?',
-//     },
-//     {
-//     // Add a role
-//       type: 'input',
-//       name: 'addRole',
-//       message: 'What would you like to do?',
-//     },
-//     {
-//     // Add an employee
-//       type: 'input',
-//       name: 'addEmployee',
-//       message: 'What would you like to do?',
-//     },
-//     {
-//     // Update an employee role
-//       type: 'input',
-//       name: 'update',
-//       message: 'What would you like to do?',
-//     },
-//     {
-//         type: "confirm",
-//         name: "exit",
-//         message: "Want to do anything else?",
-//     },
-// ];
-
 const loadImage = () => {
   console.log(logo);
 };
+
+const getAllDepartments = (cb) => {
+  // query db for all depts.
+  const sql = `SELECT id, name FROM department`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log({ error: err.message });
+      return;
+    }
+    // console.table(rows);
+    cb(rows.map(({ id, name }) => ({ value: id, name })));
+  });
+}
+
+const getAllRoles = (cb) => {
+  // query db for all roles
+  const roleSQL = 'SELECT title, salary FROM role';
+  db.query(roleSQL, (err, rows) => {
+    if (err) {
+      console.log({ error: err.message });
+      return;
+    }
+    //console.table(rows);
+    cb(rows.map(( id, name) => ({ value: id, name })));
+  });
+}
+
+const getManagers = (cb) => {
+  const managerSQL = 'SELECT first_name, last_name, manager_id FROM employee';
+  db.query(managerSQL, (err, rows) => {
+    if (err) {
+      console.log({ error: err.message });
+      return;
+    }
+    //console.table(rows);
+    cb(rows.map(( id, name) => ({ value: id, name })));
+  });
+}
 
 function init() {
   inquirer.prompt({
@@ -143,72 +149,92 @@ function init() {
               init();
             });
           });
-        const deptChoices = [];
-        // query db for all depts.
-        const sql = `SELECT id, name FROM department`;
-        db.query(sql, (err, rows) => {
-          if (err) {
-            console.log({ error: err.message });
-            return;
-          }
-          console.table(rows);
-          for (let i = 0; i < rows.length; i++) {
-            deptChoices.push(rows[i].name);}
-          }); 
       } else if (answer.choice === "ADD_ROLE") {
           // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
-          inquirer.prompt({
+          getAllDepartments((deps) => {
+            console.table(deps);
+            inquirer.prompt([
+              {
+                type: "input",
+                name: "title",
+                message: "Enter the title of the new role.",
+              },
+              {
+                type: "input",
+                name: "salary",
+                message: "Enter the salary of the new role.",
+              },
+              {
+                type: 'list',
+                name: 'department_id',
+                message: 'Which department will house this role?',
+                choices: deps
+              }
+            ])
+              .then((answers) => {
+                //console.log(answers);
+                const addRoleSQL = 'INSERT INTO role (title, salary, department_id) VALUES(?, ?, ?)';
+                //console.log(addRoleSQL);
+                db.query(addRoleSQL, [answers.title, answers.salary, answers.department_id], (err, result) => {
+                  if (err) {
+                    console.log({ error: err.message });
+                    return;
+                  }
+                  //console.log(result);
+                  init();
+                });
+              });
+          });
+      } else if (answer.choice === "ADD_EMP") {
+        // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
+        getAllRoles((roles) => {
+          console.table(roles);
+        getManagers((managers) => {
+          console.table(managers);
+        })
+          inquirer.prompt([
+            {
               type: "input",
-              name: "addRole",
-              message: "Enter the title and salary of the new role.",
-            })
+              name: "firstName",
+              message: "What is the employee's first name?",
+            },
+            {
+              type: "input",
+              name: "lastName",
+              message: "What is the employee's last name?",
+            },
+            {
+              type: "list",
+              name: "role",
+              message: "What is the employee's role?",
+              choices: roles
+            },
+            {
+              type: "list",
+              name: "manager",
+              message: "Who is the employee's manager?",
+              choices: managers
+            }
+//  TODO:/Users/benwofford/class-repo/homework/employee-tracker/index.js:216
+//             choices: managers
+//                      ^
+// ReferenceError: managers is not defined
+          ])
             .then((answers) => {
-              console.log(answers);
-              const addRoleSQL = 'INSERT INTO role (title, salary) VALUES("' + answers.addRole + '", "' + answers.addRole + '")';
-              console.log(addRoleSQL);
-              db.query(addRoleSQL, (err, result) => {
+              //console.log(answers);
+              const addEmpSQL = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?, ?, ?, ?)';
+              //console.log(addEmpSQL);
+              db.query(addEmpSQL, [answers.firstName, answers.lastName, answers.role, answers.manager], (err, result) => {
                 if (err) {
                   console.log({ error: err.message });
                   return;
                 }
-                console.log(result);
+                //console.log(result);
                 init();
               });
             });
-            const roleChoices = [];
-            // query db for all roles
-            const roleSQL = 'SELECT title, salary FROM role';
-            db.query(roleSQL, (err, rows) => {
-              if (err) {
-                console.log({ error: err.message });
-                return;
-              }
-              console.table(rows);
-              for (let i = 0; i < rows.length; i++) {
-                roleChoices.push(rows[i].name);}
-              });
-      } else if (answer.choice === "ADD_EMP") {
-        inquirer
-          .prompt({
-            type: "input",
-            name: "addDept",
-            message: "What would you like to do?",
-          })
-          .then((answers) => {
-            console.log(answers);
-            const addDeptSQL =
-              'INSERT INTO department(name) VALUES("' + answers.addDept + '")';
-            console.log(addDeptSQL);
-            db.query(addDeptSQL, (err, result) => {
-              if (err) {
-                console.log({ error: err.message });
-                return;
-              }
-              console.log(result);
-              init();
-            });
-          });
-      } else if (answer.choice === "UPDATE_EMP") {
+        });
+    } else if (answer.choice === "UPDATE_EMP") {
         // query db for user id, first name & last name
         // query db for role id & role name
         const userChoices = [];
