@@ -47,6 +47,21 @@ const getManagers = (cb) => {
   });
 };
 
+const getEmployees = (cb) => {
+  const employeeSQL = `SELECT first_name, last_name, role_id,
+                      FROM employee
+                      INNER JOIN role
+                      ON employee.role_id = role.id`;
+  db.query(employeeSQL, (err, rows) => {
+    if (err) {
+      console.log({ error: err.message });
+      return;
+    }
+    //console.table(rows);
+    cb(rows.map((id, name) => ({ value: id, name })));
+  });
+};
+
 function init() {
   inquirer
     .prompt({
@@ -203,8 +218,7 @@ function init() {
           getManagers((managers) => {
             console.table(managers);
             return { roles, managers };
-          })
-            .then(function ({ roles, managers }) {
+          }).then(function ({ roles, managers }) {
               const roleChoices = roles.map(({ title, id }) => ({
                 name: title,
                 value: id,
@@ -265,17 +279,33 @@ function init() {
                       init();
                     }
                   );
-                });
-            });
+                }) //.catch(error => console.error(error));
+            }) //.catch(error => console.error(error));
         }) .catch(error => console.error(error));
       } else if (answer.choice === "UPDATE_EMP") {
         // query db for user id, first name & last name
         // query db for role id & role name
-        const userChoices = [];
-        const roleChoices = [];
-        const userSQL = `Select id, first_name, last_name from employee`;
-        db.query(userSQL, (err, rows) => {
           // [{id:1, first_name:"john", last_name:"doe"}, {id:2, first_name:"jane", last_name:"doe"}]
+          const updateEmpSQL = `UPDATE role_id FROM employee`;
+          getEmployees((emps) => {
+            console.table(emps);
+            inquirer.prompt([
+              {
+                type: "list",
+                name: "employees",
+                message: "Which employee would you like to update?",
+                choices: emps,
+              },
+              {
+                type: "list",
+                name: "updateRole",
+                message: "What is their new role?",
+                choices: roles,
+              },
+            ])
+            .then((answers) => {
+              db.query(updateEmpSQL, [answers.emps, answers.roles],
+                (err, result) => {
           if (err) {
             console.log({ error: err.message });
             return;
@@ -283,6 +313,8 @@ function init() {
           console.table(rows);
           init();
         });
+      });
+    }); 
       } else if (answer.choice === "EXIT") {
         console.log("Goodbye.");
         process.exit();
